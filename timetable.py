@@ -9,8 +9,11 @@ Date: 2025-01-26
 """
 
 import requests
+import os
 from ics import Calendar
 from datetime import datetime
+from dotenv import load_dotenv
+
 
 def print_event_formatted(event):
     """
@@ -112,6 +115,16 @@ def fetch_calendar(url):
     response = requests.get(url)
     return response
 
+def construct_calendar_url(base_url, variable_part):
+    """
+    construct ical file url from given base url and variable part
+    
+    :param base_url: base url of the ical file (ie. https://website.com/timetable/)
+    :param variable_part: variable part of the ical file (ie. exportlink)
+    :return: url of the ical file (ie. https://website.com/timetable/exportlink)
+    """
+    return base_url + variable_part
+
 def create_calendar(url=None, filename=None):
     """
     create calendar object from given url or given filename
@@ -141,7 +154,6 @@ def create_calendar(url=None, filename=None):
     
 
 def main():
-
     """
     main function to create and manage calendar events
 
@@ -151,8 +163,12 @@ def main():
     
     :return: None
     """
+    
+    load_dotenv()
 
-    calendar=create_calendar(url="https://website.com/timetable/exportlink", filename="calendar.ics")
+    url=construct_calendar_url(base_url=os.getenv("BASE_URL"), variable_part=os.getenv("VARIABLE_PART"))
+
+    calendar=create_calendar(url=url, filename="calendar.ics")
 
     if calendar is None:
         print("error creating calendar")
